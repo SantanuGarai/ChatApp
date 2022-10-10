@@ -3,6 +3,10 @@ const http = require("http");
 const express = require("express");
 const socketio = require("socket.io");
 const Filter = require("bad-words");
+const {
+    generateMessage,
+    generateLocationMessage,
+} = require("./utils/messages");
 
 const app = express();
 const server = http.createServer(app);
@@ -17,27 +21,29 @@ let count = 0;
 io.on("connection", (socket) => {
     console.log("new webSocket Connection");
 
-    socket.emit("message", "welcome!");
-    socket.broadcast.emit("message", "A new user has joined!");
+    socket.emit("message", generateMessage("welcome!"));
+    socket.broadcast.emit("message", generateMessage("A new user has joined!"));
 
     socket.on("sendMessage", (message, callback) => {
         const filter = new Filter();
         if (filter.isProfane(message)) {
             return callback("profinity not allowed");
         }
-        io.emit("message", message);
+        io.emit("message", generateMessage(message));
         callback();
     });
     socket.on("sendlocation", (location, callback) => {
         io.emit(
-            "message",
-            `https://google.com/maps?q=${location.latitude},${location.longitude}`
+            "locationMessage",
+            generateLocationMessage(
+                `https://google.com/maps?q=${location.latitude},${location.longitude}`
+            )
         );
         callback();
     });
 
     socket.on("disconnect", () => {
-        io.emit("message", "A user has left!");
+        io.emit("message", generateMessage("A user has left!"));
     });
     //);
 });

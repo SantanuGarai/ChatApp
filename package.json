@@ -1,6 +1,9 @@
 {
     "name": "chatapp",
     "version": "1.0.0",
+    "nodemonConfig": {
+        "ext": "js,html"
+    },
     "description": "A simple chat app",
     "main": "index.js",
     "scripts": {
